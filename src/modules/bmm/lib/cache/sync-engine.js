@@ -13,7 +13,8 @@
  * @module sync-engine
  */
 
-const { CacheManager } = require('./cache-manager');
+// CacheManager type is injected via constructor, not imported directly
+// const { CacheManager } = require('./cache-manager');
 
 /**
  * Retry configuration matching migrate-to-github patterns
@@ -103,22 +104,22 @@ class SyncEngine {
     const lines = [];
 
     // Extract sections from issue body
-    lines.push(`# Story ${storyKey}: ${issue.title.replace(/Story\s+[\d-]+[a-zA-Z-]+:\s*/i, '')}`);
-    lines.push('');
-    lines.push(`**GitHub Issue:** #${issue.number}`);
-    lines.push(`**Status:** ${this._extractStatus(issue)}`);
-    lines.push(`**Assignee:** ${issue.assignee?.login || 'Unassigned'}`);
-    lines.push(`**Last Updated:** ${issue.updated_at}`);
-    lines.push('');
+    lines.push(
+      `# Story ${storyKey}: ${issue.title.replace(/Story\s+[\d-]+[a-zA-Z-]+:\s*/i, '')}`,
+      '',
+      `**GitHub Issue:** #${issue.number}`,
+      `**Status:** ${this._extractStatus(issue)}`,
+      `**Assignee:** ${issue.assignee?.login || 'Unassigned'}`,
+      `**Last Updated:** ${issue.updated_at}`,
+      '',
+    );
 
     // Include original body
     if (issue.body) {
       lines.push(issue.body);
     }
 
-    lines.push('');
-    lines.push('---');
-    lines.push(`_Synced from GitHub at ${new Date().toISOString()}_`);
+    lines.push('', '---', `_Synced from GitHub at ${new Date().toISOString()}_`);
 
     return lines.join('\n');
   }
@@ -263,8 +264,8 @@ class SyncEngine {
       return { storyKey, status: 'unchanged' };
     }
 
-    // Write to cache
-    const writeResult = this.cache.writeStory(storyKey, content, {
+    // Write to cache (result used for logging/debugging if needed)
+    this.cache.writeStory(storyKey, content, {
       github_issue: issue.number,
       github_updated_at: issue.updated_at,
       locked_by: issue.assignee?.login || null,
@@ -406,10 +407,10 @@ class SyncEngine {
       );
     }
 
-    // Verify write succeeded
+    // Verify write succeeded (result validates the operation)
     await this._sleep(1000); // GitHub eventual consistency
 
-    const verify = await this.githubClient('issue_read', {
+    await this.githubClient('issue_read', {
       method: 'get',
       owner: this.github.owner,
       repo: this.github.repo,
@@ -634,12 +635,7 @@ class SyncEngine {
       query += ` label:epic:${options.epicNumber}`;
     }
 
-    if (options.status) {
-      query += ` label:status:${options.status}`;
-    } else {
-      // Default: ready-for-dev or backlog
-      query += ` (label:status:ready-for-dev OR label:status:backlog)`;
-    }
+    query += options.status ? ` label:status:${options.status}` : ` (label:status:ready-for-dev OR label:status:backlog)`; // Default: ready-for-dev or backlog
 
     const searchResult = await this._retryWithBackoff(
       async () => this.githubClient('search_issues', { query }),

@@ -14,12 +14,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SlackNotifier, SLACK_TEMPLATES } from '../../../src/modules/bmm/lib/notifications/slack-notifier.js';
 
 // Mock global fetch
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 describe('SlackNotifier', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    global.fetch.mockResolvedValue({ ok: true });
+    globalThis.fetch.mockResolvedValue({ ok: true });
   });
 
   // ============ SLACK_TEMPLATES Tests ============
@@ -232,8 +232,8 @@ describe('SlackNotifier', () => {
 
       const result = await notifier.send('feedback_round_opened', data);
 
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         'https://hooks.slack.com/services/xxx',
         expect.objectContaining({
           method: 'POST',
@@ -241,7 +241,7 @@ describe('SlackNotifier', () => {
         }),
       );
 
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const payload = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
 
       expect(payload.channel).toBe('#prd-updates');
       expect(payload.username).toBe('PRD Crowdsource Bot');
@@ -254,7 +254,7 @@ describe('SlackNotifier', () => {
     });
 
     it('should handle webhook error', async () => {
-      global.fetch.mockResolvedValue({
+      globalThis.fetch.mockResolvedValue({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
@@ -288,7 +288,7 @@ describe('SlackNotifier', () => {
         { channel: '#urgent-prd' },
       );
 
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const payload = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
       expect(payload.channel).toBe('#urgent-prd');
     });
   });
@@ -317,9 +317,9 @@ describe('SlackNotifier', () => {
     it('should send custom message', async () => {
       const result = await notifier.sendCustom('Custom notification message');
 
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(globalThis.fetch).toHaveBeenCalledTimes(1);
 
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const payload = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
       expect(payload.text).toBe('Custom notification message');
       expect(payload.channel).toBe('#general');
 
@@ -329,12 +329,12 @@ describe('SlackNotifier', () => {
     it('should allow channel override', async () => {
       await notifier.sendCustom('Test', { channel: '#testing' });
 
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const payload = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
       expect(payload.channel).toBe('#testing');
     });
 
     it('should handle webhook error', async () => {
-      global.fetch.mockRejectedValue(new Error('Network error'));
+      globalThis.fetch.mockRejectedValue(new Error('Network error'));
 
       const result = await notifier.sendCustom('Test');
 
@@ -436,7 +436,7 @@ describe('SlackNotifier', () => {
         feedback_url: 'https://example.com/feedback/123',
       });
 
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const payload = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
 
       expect(payload.attachments[0].color).toBe('#dc3545');
       expect(payload.attachments[0].blocks).toBeInstanceOf(Array);
@@ -458,7 +458,7 @@ describe('SlackNotifier', () => {
         document_url: 'https://example.com/doc',
       });
 
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const payload = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
 
       expect(payload.attachments[0].color).toBe('#9932cc'); // Purple
       expect(payload.text).toContain('Synthesis Complete');

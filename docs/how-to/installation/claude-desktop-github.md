@@ -34,7 +34,7 @@ If you don't already have GitHub MCP configured, follow these steps. If your com
 }
 ```
 
-3. Create a token at: https://github.com/settings/tokens
+3. Create a token at: <https://github.com/settings/tokens>
    - Required scopes: `repo`, `issues`, `read:org`
 4. Restart Claude Desktop
 

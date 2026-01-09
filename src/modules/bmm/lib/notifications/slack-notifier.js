@@ -60,7 +60,7 @@ const SLACK_TEMPLATES = {
       },
       {
         type: 'section',
-        text: { type: 'mrkdwn', text: `> ${data.summary.substring(0, 200)}${data.summary.length > 200 ? '...' : ''}` },
+        text: { type: 'mrkdwn', text: `> ${data.summary.slice(0, 200)}${data.summary.length > 200 ? '...' : ''}` },
       },
       {
         type: 'actions',
@@ -94,7 +94,7 @@ const SLACK_TEMPLATES = {
       },
       {
         type: 'section',
-        text: { type: 'mrkdwn', text: data.summary.substring(0, 500) },
+        text: { type: 'mrkdwn', text: data.summary.slice(0, 500) },
       },
       {
         type: 'actions',
@@ -353,7 +353,7 @@ class SlackNotifier {
     const payload = this._buildPayload(template, data, options);
 
     try {
-      const response = await this._sendWebhook(payload);
+      await this._sendWebhook(payload);
       return {
         success: true,
         channel: 'slack',

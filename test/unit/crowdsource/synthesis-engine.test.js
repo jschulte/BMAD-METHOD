@@ -453,7 +453,7 @@ describe('SynthesisEngine', () => {
 
     it('should handle null/undefined input', () => {
       expect(engine._extractKeywords(null)).toEqual([]);
-      expect(engine._extractKeywords(undefined)).toEqual([]);
+      expect(engine._extractKeywords()).toEqual([]);
       expect(engine._extractKeywords('')).toEqual([]);
     });
 

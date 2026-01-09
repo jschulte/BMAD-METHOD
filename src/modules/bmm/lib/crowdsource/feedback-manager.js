@@ -113,7 +113,7 @@ class FeedbackManager {
       `type:${documentType}-feedback`,
       `${documentType}:${documentKey.split(':')[1]}`,
       `linked-review:${reviewIssueNumber}`,
-      `feedback-section:${section.toLowerCase().replace(/\s+/g, '-')}`,
+      `feedback-section:${section.toLowerCase().replaceAll(/\s+/g, '-')}`,
       typeConfig.label,
       FEEDBACK_STATUS.new,
       PRIORITY_LEVELS[priority] || PRIORITY_LEVELS.medium,
@@ -180,7 +180,7 @@ class FeedbackManager {
     }
 
     if (section) {
-      query += ` label:feedback-section:${section.toLowerCase().replace(/\s+/g, '-')}`;
+      query += ` label:feedback-section:${section.toLowerCase().replaceAll(/\s+/g, '-')}`;
     }
 
     if (feedbackType) {
@@ -243,7 +243,7 @@ class FeedbackManager {
       const concerns = feedbackList.filter((f) => f.feedbackType === 'concern');
       const suggestions = feedbackList.filter((f) => f.feedbackType === 'suggestion');
 
-      if (concerns.length > 1 || (concerns.length >= 1 && suggestions.length >= 1)) {
+      if (concerns.length > 1 || (concerns.length > 0 && suggestions.length > 0)) {
         conflicts.push({
           section,
           feedbackItems: feedbackList,
@@ -270,7 +270,7 @@ class FeedbackManager {
     const currentLabels = issue.labels.map((l) => l.name);
 
     // Remove old status labels, add new one
-    const newLabels = currentLabels.filter((l) => !l.startsWith('feedback-status:')).concat([statusLabel]);
+    const newLabels = [...currentLabels.filter((l) => !l.startsWith('feedback-status:')), statusLabel];
 
     await this._updateIssue(feedbackIssueNumber, { labels: newLabels });
 
@@ -320,7 +320,7 @@ class FeedbackManager {
     }
 
     stats.submitterCount = stats.submitters.size;
-    stats.submitters = Array.from(stats.submitters);
+    stats.submitters = [...stats.submitters];
 
     return stats;
   }
@@ -396,31 +396,37 @@ class FeedbackManager {
   }
 
   // GitHub API wrappers (to be called via MCP)
+  // eslint-disable-next-line no-unused-vars
   async _createIssue({ title, body, labels }) {
     // This would be: mcp__github__issue_write({ method: 'create', ... })
     throw new Error('_createIssue must be implemented by caller via GitHub MCP');
   }
 
+  // eslint-disable-next-line no-unused-vars
   async _getIssue(issueNumber) {
     // This would be: mcp__github__issue_read({ method: 'get', ... })
     throw new Error('_getIssue must be implemented by caller via GitHub MCP');
   }
 
+  // eslint-disable-next-line no-unused-vars
   async _updateIssue(issueNumber, updates) {
     // This would be: mcp__github__issue_write({ method: 'update', ... })
     throw new Error('_updateIssue must be implemented by caller via GitHub MCP');
   }
 
+  // eslint-disable-next-line no-unused-vars
   async _closeIssue(issueNumber, reason) {
     // This would be: mcp__github__issue_write({ method: 'update', state: 'closed', ... })
     throw new Error('_closeIssue must be implemented by caller via GitHub MCP');
   }
 
+  // eslint-disable-next-line no-unused-vars
   async _addComment(issueNumber, body) {
     // This would be: mcp__github__add_issue_comment({ ... })
     throw new Error('_addComment must be implemented by caller via GitHub MCP');
   }
 
+  // eslint-disable-next-line no-unused-vars
   async _searchIssues(query) {
     // This would be: mcp__github__search_issues({ query })
     throw new Error('_searchIssues must be implemented by caller via GitHub MCP');

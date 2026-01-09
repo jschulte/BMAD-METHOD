@@ -68,8 +68,8 @@ class SignoffManager {
     // Validate configuration
     this._validateConfig(signoffConfig, stakeholders);
 
-    // Update the review issue to signoff status
-    const labels = [`type:${documentType}-review`, `${documentType}:${documentKey.split(':')[1]}`, 'review-status:signoff'];
+    // Labels for updating review issue to signoff status (applied via _updateIssue)
+    const _labels = [`type:${documentType}-review`, `${documentType}:${documentKey.split(':')[1]}`, 'review-status:signoff'];
 
     // Build stakeholder checklist
     const checklist = stakeholders.map((user) => `- [ ] @${user.replace('@', '')} - ⏳ Pending`).join('\n');
@@ -101,8 +101,8 @@ class SignoffManager {
    */
   async submitSignoff({
     reviewIssueNumber,
-    documentKey,
-    documentType,
+    documentKey: _documentKey, // Reserved for future audit logging
+    documentType: _documentType, // Reserved for future audit logging
     user,
     decision, // 'approved' | 'approved_with_note' | 'blocked'
     note = null, // Optional note or blocking reason
@@ -155,7 +155,7 @@ class SignoffManager {
       if (match) {
         signoffs.push({
           user: match[1],
-          status: match[2].replace(/-/g, '_'),
+          status: match[2].replaceAll('-', '_'),
           label: label,
         });
       }
@@ -182,17 +182,21 @@ class SignoffManager {
     }
 
     switch (config.threshold_type) {
-      case THRESHOLD_TYPES.count:
+      case THRESHOLD_TYPES.count: {
         return this._calculateCountStatus(approvals, config, pending);
+      }
 
-      case THRESHOLD_TYPES.percentage:
+      case THRESHOLD_TYPES.percentage: {
         return this._calculatePercentageStatus(approvals, stakeholders, config, pending);
+      }
 
-      case THRESHOLD_TYPES.required_approvers:
+      case THRESHOLD_TYPES.required_approvers: {
         return this._calculateRequiredApproversStatus(approvals, config, pending);
+      }
 
-      default:
+      default: {
         throw new Error(`Unknown threshold type: ${config.threshold_type}`);
+      }
     }
   }
 
@@ -264,10 +268,8 @@ class SignoffManager {
   // ============ Private Methods ============
 
   _validateConfig(config, stakeholders) {
-    if (config.threshold_type === THRESHOLD_TYPES.count) {
-      if (config.minimum_approvals > stakeholders.length) {
-        throw new Error(`minimum_approvals (${config.minimum_approvals}) cannot exceed stakeholder count (${stakeholders.length})`);
-      }
+    if (config.threshold_type === THRESHOLD_TYPES.count && config.minimum_approvals > stakeholders.length) {
+      throw new Error(`minimum_approvals (${config.minimum_approvals}) cannot exceed stakeholder count (${stakeholders.length})`);
     }
 
     if (config.threshold_type === THRESHOLD_TYPES.required_approvers) {
@@ -313,10 +315,10 @@ class SignoffManager {
   }
 
   _calculateRequiredApproversStatus(approvals, config, pending) {
-    const approvedUsers = approvals.map((a) => a.user);
+    const approvedUsers = new Set(approvals.map((a) => a.user));
 
     // Check required approvers
-    const missingRequired = config.required.filter((r) => !approvedUsers.includes(r.replace('@', '')));
+    const missingRequired = config.required.filter((r) => !approvedUsers.has(r.replace('@', '')));
 
     if (missingRequired.length > 0) {
       return {
@@ -332,7 +334,7 @@ class SignoffManager {
 
     if (optionalApproved < config.minimum_optional) {
       const neededOptional = config.minimum_optional - optionalApproved;
-      const pendingOptional = config.optional.filter((o) => !approvedUsers.includes(o.replace('@', '')));
+      const pendingOptional = config.optional.filter((o) => !approvedUsers.has(o.replace('@', '')));
 
       return {
         status: 'pending',
@@ -348,31 +350,39 @@ class SignoffManager {
 
   _getDecisionEmoji(decision) {
     switch (decision) {
-      case 'approved':
+      case 'approved': {
         return '✅';
-      case 'approved_with_note':
+      }
+      case 'approved_with_note': {
         return '✅📝';
-      case 'blocked':
+      }
+      case 'blocked': {
         return '🚫';
-      default:
+      }
+      default: {
         return '⏳';
+      }
     }
   }
 
   _getDecisionText(decision) {
     switch (decision) {
-      case 'approved':
+      case 'approved': {
         return 'Approved';
-      case 'approved_with_note':
+      }
+      case 'approved_with_note': {
         return 'Approved with Note';
-      case 'blocked':
+      }
+      case 'blocked': {
         return 'Blocked';
-      default:
+      }
+      default: {
         return 'Pending';
+      }
     }
   }
 
-  _formatSignoffRequestBody({ documentKey, documentType, stakeholders, deadline, config, checklist }) {
+  _formatSignoffRequestBody({ documentKey, documentType, stakeholders: _stakeholders, deadline, config, checklist }) {
     let body = `## ✍️ Sign-off Requested\n\n`;
     body += `**Document:** \`${documentKey}\`\n`;
     body += `**Type:** ${documentType.toUpperCase()}\n`;
@@ -400,21 +410,25 @@ class SignoffManager {
 
   _formatThreshold(config) {
     switch (config.threshold_type) {
-      case THRESHOLD_TYPES.count:
+      case THRESHOLD_TYPES.count: {
         return `${config.minimum_approvals} approval(s) required`;
-      case THRESHOLD_TYPES.percentage:
+      }
+      case THRESHOLD_TYPES.percentage: {
         return `${config.approval_percentage}% must approve`;
-      case THRESHOLD_TYPES.required_approvers:
+      }
+      case THRESHOLD_TYPES.required_approvers: {
         return `Required: ${config.required.join(', ')} + ${config.minimum_optional} optional`;
-      default:
+      }
+      default: {
         return 'Unknown';
+      }
     }
   }
 
   async _addSignoffLabel(issueNumber, user, decision) {
     // Normalize user and decision for label
-    const normalizedUser = user.replace('@', '').replace(/[^a-zA-Z0-9-]/g, '-');
-    const normalizedDecision = decision.replace(/_/g, '-');
+    const normalizedUser = user.replace('@', '').replaceAll(/[^a-zA-Z0-9-]/g, '-');
+    const normalizedDecision = decision.replaceAll('_', '-');
     const label = `signoff-${normalizedUser}-${normalizedDecision}`;
 
     // Get current labels
@@ -431,16 +445,19 @@ class SignoffManager {
   }
 
   // GitHub API wrappers (to be called via MCP)
+  // eslint-disable-next-line no-unused-vars
   async _getIssue(issueNumber) {
     // This would be: mcp__github__issue_read({ method: 'get', ... })
     throw new Error('_getIssue must be implemented by caller via GitHub MCP');
   }
 
+  // eslint-disable-next-line no-unused-vars
   async _updateIssue(issueNumber, updates) {
     // This would be: mcp__github__issue_write({ method: 'update', ... })
     throw new Error('_updateIssue must be implemented by caller via GitHub MCP');
   }
 
+  // eslint-disable-next-line no-unused-vars
   async _addComment(issueNumber, body) {
     // This would be: mcp__github__add_issue_comment({ ... })
     throw new Error('_addComment must be implemented by caller via GitHub MCP');

@@ -515,14 +515,18 @@ class EmailNotifier {
     };
 
     switch (this.provider) {
-      case 'smtp':
+      case 'smtp': {
         return await this._sendViaSMTP(emailPayload);
-      case 'sendgrid':
+      }
+      case 'sendgrid': {
         return await this._sendViaSendGrid(emailPayload);
-      case 'ses':
+      }
+      case 'ses': {
         return await this._sendViaSES(emailPayload);
-      default:
+      }
+      default: {
         throw new Error(`Unknown email provider: ${this.provider}`);
+      }
     }
   }
 
@@ -564,8 +568,8 @@ class EmailNotifier {
     let result = template;
 
     // Simple mustache-like replacement
-    result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-      return data[key] !== undefined ? String(data[key]) : match;
+    result = result.replaceAll(/\{\{(\w+)\}\}/g, (match, key) => {
+      return data[key] === undefined ? match : String(data[key]);
     });
 
     return result;

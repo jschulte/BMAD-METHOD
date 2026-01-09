@@ -785,7 +785,7 @@ describe('NotificationService', () => {
 
       expect(result.success).toBe(true);
       expect(mockGithubSend).toHaveBeenCalledTimes(3);
-    }, 10000);
+    }, 10_000);
 
     it('should not retry for normal priority', async () => {
       mockGithubSend.mockResolvedValue({ success: false, error: 'Failed' });

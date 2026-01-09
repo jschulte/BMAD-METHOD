@@ -341,30 +341,30 @@ class GitHubNotifier {
 
     // Simple mustache-like replacement
     // Replace {{variable}}
-    result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-      return data[key] !== undefined ? String(data[key]) : match;
+    result = result.replaceAll(/\{\{(\w+)\}\}/g, (match, key) => {
+      return data[key] === undefined ? match : String(data[key]);
     });
 
     // Handle {{#if condition}}...{{/if}}
-    result = result.replace(/\{\{#if\s+(\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, key, content) => {
+    result = result.replaceAll(/\{\{#if\s+(\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, key, content) => {
       return data[key] ? content : '';
     });
 
     // Handle {{#each array}}...{{/each}}
-    result = result.replace(/\{\{#each\s+(\w+)\}\}([\s\S]*?)\{\{\/each\}\}/g, (match, key, content) => {
+    result = result.replaceAll(/\{\{#each\s+(\w+)\}\}([\s\S]*?)\{\{\/each\}\}/g, (match, key, content) => {
       const arr = data[key];
       if (!Array.isArray(arr)) return '';
       return arr
         .map((item, index) => {
           let itemContent = content;
           if (typeof item === 'object') {
-            Object.entries(item).forEach(([k, v]) => {
-              itemContent = itemContent.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v));
-            });
+            for (const [k, v] of Object.entries(item)) {
+              itemContent = itemContent.replaceAll(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v));
+            }
           } else {
-            itemContent = itemContent.replace(/\{\{this\}\}/g, String(item));
+            itemContent = itemContent.replaceAll('{{this}}', String(item));
           }
-          itemContent = itemContent.replace(/\{\{@index\}\}/g, String(index));
+          itemContent = itemContent.replaceAll('{{@index}}', String(index));
           return itemContent;
         })
         .join('');

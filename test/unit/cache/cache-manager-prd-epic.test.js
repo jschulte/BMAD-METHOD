@@ -14,9 +14,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
 
 // Import the CacheManager (CommonJS module)
 const { CacheManager, DOCUMENT_TYPES, CACHE_META_FILENAME } = await import('../../../src/modules/bmm/lib/cache/cache-manager.js');

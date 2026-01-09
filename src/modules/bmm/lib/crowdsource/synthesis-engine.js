@@ -169,7 +169,7 @@ class SynthesisEngine {
   /**
    * Analyze a single section's feedback
    */
-  async _analyzeSection(section, feedbackList, originalText) {
+  async _analyzeSection(section, feedbackList, _originalText) {
     const result = {
       feedbackCount: feedbackList.length,
       byType: this._groupByType(feedbackList),
@@ -259,7 +259,7 @@ class SynthesisEngine {
       .filter((t) => t.count >= 2)
       .map((t) => ({
         ...t,
-        types: Array.from(t.types),
+        types: [...t.types],
       }))
       .sort((a, b) => b.count - a.count);
   }
@@ -420,7 +420,7 @@ class SynthesisEngine {
 
     return text
       .toLowerCase()
-      .replace(/[^\w\s]/g, ' ')
+      .replaceAll(/[^\w\s]/g, ' ')
       .split(/\s+/)
       .filter((word) => word.length > 3 && !stopWords.has(word))
       .slice(0, 10); // Limit to top 10 keywords
