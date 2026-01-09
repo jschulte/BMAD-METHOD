@@ -393,7 +393,8 @@ function extract_feedback(body) {
   // Try to extract the Feedback section
   const match = body.match(/## Feedback\n\n([\s\S]*?)(?:\n##|$)/);
   if (match) {
-    return match[1].trim().slice(0, 200) + (match[1].length > 200 ? '...' : '');
+    const text = match[1].trim();
+    return text.slice(0, 200) + (text.length > 200 ? '...' : '');
   }
 
   // Fallback to first 200 chars

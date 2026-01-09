@@ -240,11 +240,11 @@ WHILE attempt < max_attempts:
   CATCH error:
     attempt++
     IF attempt < max_attempts:
-      backoff = [1000, 3000, 9000][attempt - 1]
+      backoff = [1000, 3000, 9000, 27000][attempt - 1]
       sleep backoff ms
-      output: "⚠️ Retry {{attempt}}/3: {{error}}"
+      output: "⚠️ Retry {{attempt}}/{{max_attempts - 1}}: {{error}}"
     ELSE:
-      output: "❌ FAILED to unlock after 3 retries: {{error}}"
+      output: "❌ FAILED to unlock after {{max_attempts}} attempts: {{error}}"
       output: ""
       output: "The lock may still be active in GitHub."
       output: "Try again or manually unassign in GitHub UI."

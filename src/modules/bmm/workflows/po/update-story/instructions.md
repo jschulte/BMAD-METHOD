@@ -46,7 +46,7 @@ HALTING
 📋 Current Story: {{story_key}}
 
 **Title:** {{issue.title}}
-**Status:** {{extract_status(issue.labels)}}
+**Status:** {{issue.state}}
 **Assignee:** {{issue.assignee?.login or "None"}}
 **Issue:** #{{issue.number}}
 

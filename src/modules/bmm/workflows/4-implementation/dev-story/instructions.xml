@@ -617,7 +617,7 @@ Options:
           <action>
 attempt = 0
 max_attempts = 4
-backoffs = [1000, 3000, 9000]
+backoffs = [1000, 3000, 9000, 27000]
 
 WHILE attempt < max_attempts:
   TRY:

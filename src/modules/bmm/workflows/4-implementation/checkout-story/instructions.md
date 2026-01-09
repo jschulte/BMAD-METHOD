@@ -222,7 +222,7 @@ epic_number: {{extract_epic_from_story_key(story_key)}}
     <action>
 attempt = 0
 max_attempts = 4  # 1 initial + 3 retries
-backoffs = [1000, 3000, 9000]  # ms
+backoffs = [1000, 3000, 9000, 27000]  # ms - exponential backoff
 
 WHILE attempt < max_attempts:
   TRY:
@@ -280,12 +280,12 @@ WHILE attempt < max_attempts:
     attempt++
     IF attempt < max_attempts:
       sleep backoffs[attempt - 1]
-      output: "⚠️ Retry {{attempt}}/3 after error: {{error}}"
+      output: "⚠️ Retry {{attempt}}/{{max_attempts - 1}} after error: {{error}}"
     ELSE:
       # ROLLBACK: Remove local lock file
       delete {{lock_dir}}/{{story_key}}.lock
 
-      output: "❌ FAILED to acquire lock after 3 retries"
+      output: "❌ FAILED to acquire lock after {{max_attempts}} attempts"
       output: "Error: {{error}}"
       output: ""
       output: "Local lock file removed (rollback)"
