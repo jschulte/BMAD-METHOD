@@ -437,8 +437,8 @@ class SlackNotifier {
    * @private
    */
   async _sendWebhook(payload) {
-    // Note: In a real implementation, this would use fetch or axios
-    // For the workflow engine, this will be handled by the runtime
+    // Uses the global fetch API (available in Node 18+, browsers, and most runtimes).
+    // For environments without native fetch, provide a polyfill or use node-fetch.
     const response = await fetch(this.webhookUrl, {
       method: 'POST',
       headers: {

@@ -332,14 +332,15 @@ Regenerated story breakdown:
 
 <step n="6" goal="Create Epic Document">
   <action>
+    const today = new Date().toISOString().split('T')[0]
     epic_doc = `# Epic: ${epic_title}
 
 **Epic Key:** \`epic:${epic_key}\`
 **Source PRD:** \`prd:${source_prd}\` (v${prd_version})
 **Version:** 1
 **Status:** Draft
-**Created:** ${new Date().toISOString().split('T')[0]}
-**Last Updated:** ${new Date().toISOString().split('T')[0]}
+**Created:** ${today}
+**Last Updated:** ${today}
 
 ---
 

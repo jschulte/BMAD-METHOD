@@ -3,6 +3,20 @@
  *
  * Groups feedback by section, identifies conflicts/tensions,
  * and generates proposed resolutions with rationale.
+ *
+ * ## Integration Contract
+ *
+ * This class is designed for use within BMAD workflow instructions, where
+ * LLM operations are executed by Claude during workflow execution. The
+ * _llmGenerate method throws an error to indicate it must be implemented
+ * by the workflow runtime.
+ *
+ * When used in workflow instructions, LLM generation is performed by Claude
+ * directly interpreting the prompts and generating responses. The prompts
+ * in SYNTHESIS_PROMPTS define the expected input/output contract.
+ *
+ * For standalone usage, extend this class and override _llmGenerate with
+ * your LLM API client of choice (e.g., Anthropic SDK, OpenAI SDK).
  */
 
 const SYNTHESIS_PROMPTS = {

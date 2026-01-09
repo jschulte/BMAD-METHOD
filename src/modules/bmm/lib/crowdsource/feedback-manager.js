@@ -3,6 +3,21 @@
  *
  * Handles creation, querying, and status updates of feedback issues.
  * Works with both PRDs and Epics through a common interface.
+ *
+ * ## Integration Contract
+ *
+ * This class is designed for use within BMAD workflow instructions, where
+ * GitHub operations are executed via MCP tools. The private methods
+ * (_createIssue, _searchIssues, _updateIssue, _addComment) throw errors
+ * to indicate they must be implemented by the workflow runtime.
+ *
+ * When used in workflow instructions, these calls are replaced with:
+ * - _createIssue → mcp__github__issue_write({ method: 'create', ... })
+ * - _searchIssues → mcp__github__search_issues({ ... })
+ * - _updateIssue → mcp__github__issue_write({ method: 'update', ... })
+ * - _addComment → mcp__github__add_issue_comment({ ... })
+ *
+ * For standalone usage, extend this class and override the private methods.
  */
 
 const FEEDBACK_TYPES = {

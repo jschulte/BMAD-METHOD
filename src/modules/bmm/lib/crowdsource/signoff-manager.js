@@ -5,6 +5,21 @@
  * - count: Minimum number of approvals needed
  * - percentage: Percentage of stakeholders must approve
  * - required_approvers: Specific people must approve + minimum optional
+ *
+ * ## Integration Contract
+ *
+ * This class is designed for use within BMAD workflow instructions, where
+ * GitHub operations are executed via MCP tools. The private methods
+ * (_getIssue, _updateIssue, _addComment) throw errors to indicate they
+ * must be implemented by the workflow runtime.
+ *
+ * When used in workflow instructions, these calls are replaced with:
+ * - _getIssue → mcp__github__issue_read({ method: 'get', ... })
+ * - _updateIssue → mcp__github__issue_write({ method: 'update', ... })
+ * - _addComment → mcp__github__add_issue_comment({ ... })
+ *
+ * For standalone usage, extend this class and override the private methods
+ * with your GitHub API client of choice.
  */
 
 const SIGNOFF_STATUS = {
