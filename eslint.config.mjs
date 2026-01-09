@@ -93,6 +93,8 @@ export default [
       'n/no-unpublished-import': 'off',
       'unicorn/prefer-module': 'off',
       'no-unused-vars': 'off',
+      // fetch is stable in Node 18+ and used for mocking in tests
+      'n/no-unsupported-features/node-builtins': 'off',
     },
   },
 
@@ -137,6 +139,21 @@ export default [
       'unicorn/prefer-module': 'off',
       'n/no-missing-require': 'off',
       'n/no-unpublished-require': 'off',
+    },
+  },
+
+  // BMM module lib files use CommonJS for workflow system compatibility
+  {
+    files: ['src/modules/bmm/lib/**/*.js'],
+    rules: {
+      // Allow CommonJS patterns - these files are designed for BMAD workflow runtime
+      'unicorn/prefer-module': 'off',
+      // Allow reduce for complex data transformations in synthesis engine
+      'unicorn/no-array-reduce': 'off',
+      // Relaxed unused vars for integration contract stub parameters
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      // fetch is stable in Node 18+ in practice
+      'n/no-unsupported-features/node-builtins': 'off',
     },
   },
 
