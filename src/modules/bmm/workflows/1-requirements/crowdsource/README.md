@@ -2,6 +2,13 @@
 
 Welcome! This guide helps team members (developers, designers, tech leads, etc.) participate in PRD and Epic reviews using Claude Desktop.
 
+> **Note for POs**: This system uses a **two-gate model**:
+> - **Gate 1** (`/publish-review`): Share PRD/Epic for stakeholder feedback
+> - **Gate 2** (`/ship-stories`): Make approved stories available for development
+>
+> Drafting happens locally. Nothing goes to GitHub until you explicitly publish.
+> See the [PO Quick Start Guide](./po-quickstart.md) for details.
+
 ---
 
 ## What Can You Do?

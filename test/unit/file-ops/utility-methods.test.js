@@ -208,7 +208,8 @@ describe('FileOps', () => {
       const stats = await fileOps.stat(filePath);
 
       expect(stats.mtime).toBeInstanceOf(Date);
-      expect(stats.mtime.getTime()).toBeLessThanOrEqual(Date.now());
+      // Add small tolerance (100ms) to account for filesystem timing precision
+      expect(stats.mtime.getTime()).toBeLessThanOrEqual(Date.now() + 100);
     });
   });
 });

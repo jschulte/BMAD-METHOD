@@ -358,12 +358,19 @@ The PRD has been saved locally. It is NOT yet on GitHub.
 📌 NEXT STEPS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Your PRD draft is ready. What would you like to do next?
+Your PRD draft is ready. It is saved LOCALLY only.
 
-[1] Open feedback round now (notify stakeholders)
+To share with stakeholders for feedback, you'll need to PUBLISH it
+to GitHub using `/publish-review`. This is a two-gate system:
+  • Gate 1: /publish-review - Share for feedback (creates GitHub Review Issue)
+  • Gate 2: /ship-stories - Make stories available for development
+
+What would you like to do next?
+
+[1] Publish for review now (Gate 1 - notify stakeholders)
 [2] Edit PRD further before sharing
 [3] View PRD
-[4] Done for now
+[4] Done for now (PRD stays local)
 
   </output>
 
@@ -371,18 +378,18 @@ Your PRD draft is ready. What would you like to do next?
 
   <check if="choice == 1">
     <output>
-Opening feedback round for prd:{{prd_key}}...
+Publishing PRD for review: prd:{{prd_key}}...
     </output>
-    <action>Load workflow: open-feedback-round with prd_key = prd_key</action>
+    <action>Load workflow: publish-review with document_type = 'prd', document_key = prd_key</action>
   </check>
 
   <check if="choice == 2">
     <output>
 To edit the PRD, open: {{prd_path}}
 
-When ready, run the feedback round with:
-  "Open feedback for prd:{{prd_key}}"
-  or use menu trigger: OF
+When ready to share, run:
+  "/publish-review prd:{{prd_key}}"
+  or use menu trigger: PR
     </output>
     <action>Exit</action>
   </check>
