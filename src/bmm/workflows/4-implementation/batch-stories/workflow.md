@@ -193,16 +193,49 @@ echo "🔍 Checking prerequisites..."
 **Check 1: Story file exists?**
 ```bash
 if [ ! -f "$STORY_FILE" ]; then
-  echo "⚠️  Creating greenfield story (no gap analysis)..."
+  echo "❌ STORY FILE MISSING: $STORY_FILE"
 fi
 ```
 
-If missing, auto-create using greenfield workflow:
-- Use Skill tool: `/bmad_bmm_create-story {{story_key}}`
-- Verify created: `[ -f "$STORY_FILE" ]`
+⚠️ **CRITICAL: NEVER WRITE STORY FILES DIRECTLY!**
+
+If story file is missing, you MUST use the proper story creation workflow:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  🚨 MANDATORY: Story Creation Enforcement                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ALWAYS use: /bmad_bmm_create-story-with-gap-analysis           │
+│                                                                 │
+│  This workflow will:                                            │
+│  1. Analyze the existing codebase for relevant code             │
+│  2. Identify what already exists vs what's needed               │
+│  3. Generate properly structured tasks with gap analysis        │
+│  4. Create acceptance criteria based on actual requirements     │
+│                                                                 │
+│  ❌ DO NOT:                                                      │
+│  - Write story files manually                                   │
+│  - Use Write/Edit tools to create story content                 │
+│  - Skip gap analysis "to save time"                             │
+│  - Create placeholder tasks like "TBD" or "TODO"                │
+│                                                                 │
+│  The Story Quality Gate (Phase 0) will REJECT poorly            │
+│  formed stories anyway, so do it right the first time!          │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**If story file missing:**
+1. STOP processing this story
+2. Use Skill tool: `/bmad_bmm_create-story-with-gap-analysis {{story_key}}`
+3. WAIT for story creation to complete
+4. Verify story file exists and passes quality checks
+5. THEN continue with implementation
 
 ```bash
-echo "✅ Prerequisites satisfied"
+[ -f "$STORY_FILE" ] || { echo "❌ Story creation failed"; exit 1; }
+echo "✅ Story file exists and ready for implementation"
 ```
 
 **Step B: Execute Pipeline Phases DIRECTLY (not wrapped in Task)**
