@@ -11,7 +11,7 @@ communication_language: "{config_source}:communication_language"
 
 # Workflow components
 installed_path: "{project-root}/_bmad/bmm/workflows/4-implementation/multi-agent-review"
-instructions: "{installed_path}/instructions.md"
+instructions: "{installed_path}/workflow.md"
 
 # Input parameters
 story_id: "{story_id}" # Required

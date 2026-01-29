@@ -15,8 +15,8 @@ date: system-generated
 
 # Workflow paths
 installed_path: "{project-root}/_bmad/bmm/workflows/4-implementation/story-full-pipeline"
+instructions: "{installed_path}/workflow.md"
 agents_path: "{installed_path}/agents"
-steps_path: "{installed_path}/steps"
 
 # Agent tracking (from GSD)
 agent_history: "{sprint_artifacts}/agent-history.json"

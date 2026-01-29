@@ -8,6 +8,10 @@ config_source: "{project-root}/_bmad/bmm/config.yaml"
 output_folder: "{config_source}:output_folder"
 sprint_artifacts: "{output_folder}/sprint-artifacts"
 
+# Workflow paths
+installed_path: "{project-root}/_bmad/bmm/workflows/4-implementation/revalidate-story"
+instructions: "{installed_path}/workflow.md"
+
 # Input parameters
 story_file: "{story_file}" # Required: Full path to story file
 fill_gaps: false # Optional: Fill missing items after verification (default: verify-only)

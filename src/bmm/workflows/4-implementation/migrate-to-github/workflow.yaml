@@ -9,6 +9,10 @@ output_folder: "{config_source}:output_folder"
 sprint_artifacts: "{output_folder}/sprint-artifacts"
 sprint_status: "{output_folder}/sprint-status.yaml"
 
+# Workflow paths
+installed_path: "{project-root}/_bmad/bmm/workflows/4-implementation/migrate-to-github"
+instructions: "{installed_path}/workflow.md"
+
 # GitHub configuration
 github:
   owner: "{github_owner}" # Required: GitHub username or org

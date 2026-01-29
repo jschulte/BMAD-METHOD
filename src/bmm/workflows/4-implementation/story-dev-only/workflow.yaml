@@ -12,6 +12,7 @@ date: system-generated
 
 # Workflow paths
 installed_path: "{project-root}/_bmad/bmm/workflows/4-implementation/story-dev-only"
+instructions: "{installed_path}/workflow.md"
 steps_path: "{installed_path}/steps"
 templates_path: "{installed_path}/templates"
 checklists_path: "{installed_path}/checklists"

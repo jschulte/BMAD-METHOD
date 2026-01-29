@@ -12,7 +12,7 @@ implementation_artifacts: "{config_source}:implementation_artifacts"
 
 # Workflow components
 installed_path: "{project-root}/_bmad/bmm/workflows/4-implementation/recover-sprint-status"
-instructions: "{installed_path}/instructions.md"
+instructions: "{installed_path}/workflow.md"
 
 # Inputs
 variables:

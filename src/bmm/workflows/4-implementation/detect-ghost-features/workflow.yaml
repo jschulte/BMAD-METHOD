@@ -9,6 +9,10 @@ output_folder: "{config_source}:output_folder"
 sprint_artifacts: "{output_folder}/sprint-artifacts"
 sprint_status: "{output_folder}/sprint-status.yaml"
 
+# Workflow paths
+installed_path: "{project-root}/_bmad/bmm/workflows/4-implementation/detect-ghost-features"
+instructions: "{installed_path}/workflow.md"
+
 # Input parameters
 epic_number: "{epic_number}" # Optional: Limit to specific epic (e.g., "2")
 scan_scope: "sprint" # "sprint" | "epic" | "codebase"

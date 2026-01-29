@@ -9,6 +9,10 @@ output_folder: "{config_source}:output_folder"
 sprint_artifacts: "{output_folder}/sprint-artifacts"
 sprint_status: "{output_folder}/sprint-status.yaml"
 
+# Workflow paths
+installed_path: "{project-root}/_bmad/bmm/workflows/4-implementation/revalidate-epic"
+instructions: "{installed_path}/workflow.md"
+
 # Input parameters
 epic_number: "{epic_number}" # Required: Epic number (e.g., "2" for Epic 2)
 fill_gaps: false # Optional: Fill missing items after verification
