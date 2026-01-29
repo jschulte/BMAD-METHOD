@@ -24,7 +24,7 @@ Measure twice, cut once. Trust but verify. Evidence-based validation. Self-impro
 
 <config>
 name: story-full-pipeline
-version: 4.1.0
+version: 4.2.0
 execution_mode: multi_agent
 
 phases:
@@ -864,6 +864,33 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 **Update sprint-status.yaml:**
 Use Edit tool: \`"{{story_key}}: ready-for-dev"\` → \`"{{story_key}}: done"\`
+
+**Commit validated changes:**
+\`\`\`bash
+# Stage story file and sprint status updates
+git add docs/sprint-artifacts/{{story_key}}.md
+git add docs/sprint-artifacts/sprint-status.yaml
+git add docs/sprint-artifacts/completions/
+
+# Create reconciliation commit
+git commit -m "$(cat <<'EOF'
+chore({{story_key}}): reconcile story completion
+
+- Check off completed tasks with code citations
+- Fill Dev Agent Record with pipeline results
+- Update sprint-status to done
+- Archive completion artifacts
+EOF
+)"
+
+echo "✅ Reconciliation committed"
+\`\`\`
+
+**Verify commit:**
+\`\`\`bash
+git log --oneline -1 | grep -q "reconcile" || { echo "❌ Reconciliation commit failed"; exit 1; }
+echo "✅ Reconciliation commit verified"
+\`\`\`
 </step>
 
 <step name="playbook_reflection">
@@ -1022,7 +1049,8 @@ If \`auto_apply_updates: false\` (default):
 - [ ] Phase 4: Inspector recheck passed
 - [ ] Phase 5: Orchestrator reconciled with Inspector evidence
 - [ ] Phase 6: Playbook reflection completed
-- [ ] Git commit exists
+- [ ] Implementation commit exists (from Phase 3)
+- [ ] Reconciliation commit exists (from Phase 5)
 - [ ] Story tasks checked with code citations
 - [ ] Dev Agent Record filled
 - [ ] Coverage ≥ {{coverage_threshold}}%
@@ -1036,4 +1064,5 @@ If \`auto_apply_updates: false\` (default):
 4. ✅ Micro stories get 2 reviewers + security scan (v3.2+) - not zero
 5. ✅ Test Quality Agent (v4.0) + Coverage Gate (v4.0) - validates test quality and enforces threshold
 6. ✅ Playbook query (v4.0) before Builder + reflection (v4.0) after - continuous learning
+7. ✅ Reconciliation commit (v4.2) - commits story file updates after validation
 </improvements_v4>
