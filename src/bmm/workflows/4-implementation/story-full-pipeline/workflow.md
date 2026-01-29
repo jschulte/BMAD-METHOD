@@ -9,32 +9,34 @@ Builder fixes issues in its own context (50-70% token savings).
 <philosophy>
 **Quality Through Discipline, Continuous Learning**
 
+- Story Quality Gate: Fresh validation before committing resources
 - Playbook Query: Load relevant patterns before starting
-- Builder: Implements with playbook knowledge (context preserved)
-- Inspector + Test Quality + Reviewers: Validate in parallel with proof
+- Mason: Implements with playbook knowledge (context preserved)
+- Vera + Tessa + Rex: Validate in parallel with evidence
 - Coverage Gate: Automated threshold enforcement
-- Builder: Fixes issues in same context (50-70% token savings)
-- Inspector: Quick recheck
+- Mason: Refines issues in same context (50-70% token savings)
+- Vera: Quick recheck
 - Orchestrator: Reconciles mechanically
-- Reflection: Updates playbooks for future agents
+- Rita: Updates playbooks for future agents
 
-Trust but verify. Fresh context for verification. Evidence-based validation. Self-improving system.
+Measure twice, cut once. Trust but verify. Evidence-based validation. Self-improving system.
 </philosophy>
 
 <config>
 name: story-full-pipeline
-version: 4.0.0
+version: 4.1.0
 execution_mode: multi_agent
 
 phases:
-  phase_0: Playbook Query (orchestrator)
-  phase_1: Builder (saves agent_id)
-  phase_2: [Inspector + Test Quality + N Reviewers] in parallel
+  phase_0: Story Quality Gate (orchestrator validates story readiness)
+  phase_0.5: Playbook Query (orchestrator)
+  phase_1: Mason the Craftsman (saves agent_id)
+  phase_2: [Vera + Tessa + Rex reviewers] in parallel
   phase_2.5: Coverage Gate (automated)
-  phase_3: Resume Builder with all findings (reuses context)
-  phase_4: Inspector re-check (quick verification)
+  phase_3: Resume Mason with all findings (reuses context)
+  phase_4: Vera re-check (quick verification)
   phase_5: Orchestrator reconciliation
-  phase_6: Playbook Reflection
+  phase_6: Rita reflection (playbook updates)
 
 reviewer_counts:
   micro: 2 reviewers (security, architect/integration)
@@ -100,12 +102,99 @@ fi
 Determine agents to spawn: Inspector + Test Quality + $REVIEWER_COUNT Reviewers
 </step>
 
-<step name="query_playbooks">
-**Phase 0: Playbook Query**
+<step name="story_quality_gate">
+**Phase 0: Story Quality Gate**
 
 \`\`\`
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📚 PHASE 0: PLAYBOOK QUERY
+🔍 PHASE 0: STORY QUALITY GATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fresh validation before committing dev resources
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+\`\`\`
+
+**Orchestrator performs these checks directly (no Task spawn):**
+
+Read the story file with fresh eyes and validate:
+
+**1. Required Sections Exist:**
+\`\`\`bash
+# Check for essential story structure
+grep -q "## Story Title\|## Story:" "$STORY_FILE" || echo "❌ MISSING: Story Title"
+grep -q "## Business Context\|## Context\|## Background" "$STORY_FILE" || echo "⚠️  MISSING: Business Context"
+grep -q "## Acceptance Criteria\|## AC\|## Definition of Done" "$STORY_FILE" || echo "❌ MISSING: Acceptance Criteria"
+grep -q "## Tasks\|## Implementation Tasks\|^- \[ \]" "$STORY_FILE" || echo "❌ MISSING: Tasks"
+\`\`\`
+
+**2. Tasks Are Well-Defined (not placeholders):**
+\`\`\`bash
+# Check for placeholder tasks
+PLACEHOLDER_TASKS=$(grep -E "^\- \[ \] (TBD|TODO|WIP|Placeholder|...)" "$STORY_FILE" | wc -l)
+if [ "$PLACEHOLDER_TASKS" -gt 0 ]; then
+  echo "❌ BLOCKER: $PLACEHOLDER_TASKS placeholder tasks found"
+  grep -E "^\- \[ \] (TBD|TODO|WIP|Placeholder|...)" "$STORY_FILE"
+fi
+
+# Check tasks have meaningful descriptions (> 10 chars)
+SHORT_TASKS=$(grep "^- \[ \]" "$STORY_FILE" | awk 'length($0) < 20' | wc -l)
+if [ "$SHORT_TASKS" -gt 0 ]; then
+  echo "⚠️  WARNING: $SHORT_TASKS tasks may be too brief"
+fi
+\`\`\`
+
+**3. No Unresolved Blockers:**
+\`\`\`bash
+# Check for blocker markers
+BLOCKERS=$(grep -ciE "\[BLOCKER\]|\[BLOCKED\]|\[NEEDS.DECISION\]|\[NEEDS.CLARIFICATION\]|\[UNRESOLVED\]" "$STORY_FILE")
+if [ "$BLOCKERS" -gt 0 ]; then
+  echo "❌ BLOCKER: $BLOCKERS unresolved blockers found"
+  grep -iE "\[BLOCKER\]|\[BLOCKED\]|\[NEEDS.DECISION\]|\[NEEDS.CLARIFICATION\]|\[UNRESOLVED\]" "$STORY_FILE"
+fi
+\`\`\`
+
+**4. Acceptance Criteria Are Testable:**
+\`\`\`bash
+# Count acceptance criteria
+AC_COUNT=$(grep -cE "^\- \[ \].*should|^\- \[ \].*must|^\- \[ \].*can|^- Given.*When.*Then" "$STORY_FILE" || echo "0")
+if [ "$AC_COUNT" -eq 0 ]; then
+  echo "⚠️  WARNING: No testable acceptance criteria found (should/must/can/Given-When-Then)"
+fi
+\`\`\`
+
+**5. Gap Analysis Status (brownfield check):**
+\`\`\`bash
+# If story references existing code, check gap analysis was done
+if grep -q "existing\|modify\|update\|extend\|refactor" "$STORY_FILE"; then
+  if ! grep -q "Gap Analysis\|Codebase Analysis\|## Existing Code" "$STORY_FILE"; then
+    echo "⚠️  WARNING: Story references existing code but no gap analysis section found"
+  fi
+fi
+\`\`\`
+
+**Quality Gate Decision:**
+\`\`\`
+IF any ❌ BLOCKER found:
+  → HALT pipeline
+  → Report issues to user
+  → Suggest: "Run /bmad_bmm_validate to fix story issues"
+
+IF only ⚠️ WARNINGs found:
+  → Display warnings to user
+  → ASK: "Proceed despite warnings? [y/N]"
+  → If user declines, halt pipeline
+
+IF all checks pass:
+  → Display "✅ Story quality gate passed"
+  → Proceed to Phase 0.5 (Playbook Query)
+\`\`\`
+</step>
+
+<step name="query_playbooks">
+**Phase 0.5: Playbook Query**
+
+\`\`\`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 PHASE 0.5: PLAYBOOK QUERY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 \`\`\`
 
